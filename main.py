@@ -21,6 +21,7 @@ from datasets.pascal3d.split_train_val_test_VOC import cad_num_per_class
 from models.inceptionV3 import InceptionV3
 from models.mcmr import MCMRNet
 from models.renderer_softras import NeuralRenderer as SOFTRAS_renderer
+from soft_renderer import Mesh
 from utils.geometry import y_rot
 from utils.lab_color import rgb_to_lab, lab_to_rgb
 from utils.losses import kp_l2_loss, deform_l2reg, camera_loss, quat_reg, GraphLaplacianLoss
@@ -506,6 +507,11 @@ class MultiShapePredictor():
         else:
             cv2.imwrite(str(save_dir / 'images-flipped' / 'texture' / f'{idx:04}.png'), img_pred_texture[..., ::-1])
             cv2.imwrite(str(save_dir / 'images-flipped' / 'shape' / f'{idx:04}.png'), img_pred_shape[..., ::-1])
+
+        # save obj to disk
+        mesh = Mesh(verts, faces, texture)
+        mesh_out_path = str(save_dir / 'meshes' / f'{idx:04}.obj')
+        mesh.save_obj(mesh_out_path, save_texture=True)
 
         # canonic matrix
         R1 = cv2.Rodrigues(np.array([0, np.pi / 2, 0]))[0]
@@ -1193,12 +1199,15 @@ class MultiShapePredictor():
                     dir_name += '-qualitative'
                 self.save_dir = self.args.save_dir / dir_name
             if self.args.qualitative_results:
-                sub_dirs = ['images', 'images-flipped', 'images-rotations', 'wms', 'wms-flipped', 'wms-rotations']
+                sub_dirs = ['images', 'images-flipped', 'images-rotations', 'wms', 'wms-flipped', 'wms-rotations', 'meshes']
             else:
                 sub_dirs = ['gifs', 'images', 'images-flipped', 'canonical-rotations']
             for sub_dir in sub_dirs:
                 for sub_sub_dir in ['texture', 'shape']:
-                    curr_dir = self.save_dir / sub_dir / sub_sub_dir
+                    if sub_dir != "meshes":
+                        curr_dir = self.save_dir / sub_dir / sub_sub_dir
+                    else:
+                        curr_dir = self.save_dir / sub_dir
                     if not curr_dir.is_dir():
                         curr_dir.mkdir(exist_ok=True, parents=True)
 
