@@ -13,7 +13,6 @@ import numpy as np
 import torch
 from pytorch3d.loss import mesh_laplacian_smoothing
 from pytorch3d.structures.meshes import Meshes
-from torch.utils.tensorboard import SummaryWriter
 
 from datasets.cub.dataset import CUBDataset
 from datasets.pascal3d.dataset import PascalDataset

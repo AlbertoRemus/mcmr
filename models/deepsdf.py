@@ -1,6 +1,7 @@
 # Code modified from original version:
 # https://github.com/facebookresearch/DeepSDF/blob/master/networks/deep_sdf_decoder.py
 
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
